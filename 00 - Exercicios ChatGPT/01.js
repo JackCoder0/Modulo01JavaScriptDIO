@@ -1,5 +1,6 @@
-let temperaturaC = 30;
+// Escreva um programa que solicite ao usuário seu nome e idade, 
+// armazene essas informações em variáveis e depois as imprima na tela.
 
-let temperaturaF = temperaturaC * 9/5 + 32;
-
-console.log(temperaturaC + '°C é igual a ' + temperaturaF + '°F');
+let nome = "Jackson";
+let idade = 19;
+console.log(nome, idade)
