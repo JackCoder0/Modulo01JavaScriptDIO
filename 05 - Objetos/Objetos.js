@@ -16,3 +16,8 @@ console.log(pessoa['idade']);
 console.log(pessoa['email']);
 
 pessoa.saudacao()
+
+//Deletando informação
+delete pessoa.email
+
+console.log(pessoa);
