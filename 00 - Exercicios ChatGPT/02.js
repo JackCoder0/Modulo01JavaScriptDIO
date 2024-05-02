@@ -1,4 +1,13 @@
-// Crie um programa que calcule o preço total de uma compra em uma loja. 
-// O programa deve solicitar ao usuário o preço de cada item comprado e a quantidade de itens. 
-// Em seguida, calcule e exiba o preço total, incluindo um imposto de 10%.
+// Verificar se um número é positivo, negativo ou zero
 
+const num = (-15);
+
+if (num > 0) {
+    console.log('O número é positivo.');
+}
+else if( num < 0) {
+    console.log('O número é negativo.')
+}
+else {
+    console.log('O número é zero.')
+}
