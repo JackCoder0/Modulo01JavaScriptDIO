@@ -6,7 +6,7 @@
 //   Entrada: 5.5
 //   Saída: Recuperação
 
-const media = -1;
+const media = 5.5;
 
 if (media >= 0 && media < 5) {
   console.log("Reprovado:", media);
