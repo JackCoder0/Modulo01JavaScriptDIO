@@ -8,4 +8,5 @@ class Pokemon {
   weight;
   height;
   stats = [];
+  evolutions = [];
 }

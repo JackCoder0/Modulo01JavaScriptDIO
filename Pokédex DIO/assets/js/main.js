@@ -4,7 +4,7 @@ $(document).ready(function () {
   const $cardPokemon = $('.card-pokemon');
 
   const maxRecords = 151;
-  const limit = 10;
+  const limit = 133;
   let offset = 0;
 
   function convertWeightToKilograms(weight) {
@@ -41,7 +41,9 @@ $(document).ready(function () {
           <img class="sts-icon" src="/assets/img/stats/${statName}.png">
         </div>
         <div class="col-1">
-          ${statName.charAt(0).toUpperCase() + statName.slice(1)}
+          <span class="fs-5 text-white fw-semibold">
+            ${statValue}
+          </span>
         </div>
         <div class="col">
           <div class="status-bar-box">
@@ -66,7 +68,8 @@ $(document).ready(function () {
       <div class="pkm-infos">
         <div class="label-hw d-flex flex-column align-items-center justify-content-center">
           <p class="d-flex align-items-center m-0 hw-text">
-            <i class="uil uil-ruler"></i> Altura
+            <iconify-icon icon="material-symbols:height" width="30" height="30"></iconify-icon>
+            Altura
           </p>
           <span class="hw">${heightInMeters.toFixed(1)} M</span>
         </div>
@@ -75,7 +78,8 @@ $(document).ready(function () {
         </div>
         <div class="label-hw d-flex flex-column align-items-center justify-content-center">
           <p class="d-flex align-items-center m-0 hw-text">
-            <i class="uil uil-dumbbell"></i> Peso
+            <iconify-icon icon="material-symbols:weight-outline" width="30" height="30"></iconify-icon>
+            Peso
           </p>
           <span class="hw">${weightInKg.toFixed(1)} KG</span>
         </div>
@@ -146,10 +150,10 @@ $(document).ready(function () {
         break;
     }
 
-    $element.css('background-image', `url(/assets/img/half-pokeball.svg), radial-gradient(80% 80% at 50% bottom, ${gradientColor}, rgba(6, 14, 32, 0.8))`);
+    $element.css('background-image', `url(/assets/img/half-pokeball.svg), radial-gradient(80% 80% at 50% bottom, ${gradientColor}, rgb(6, 14, 32))`);
 
     if ($iconElement) {
-      $iconElement.css('background-image', `radial-gradient(circle, ${gradientColor}, rgba(6, 14, 32, 0.8))`);
+      $iconElement.css('background-image', `radial-gradient(circle, ${gradientColor}, rgb(6, 14, 32))`);
     }
   }
 
@@ -239,14 +243,48 @@ $(document).ready(function () {
           const heightInMeters = convertHeightToMeters(pokemon.height);
           const statusBars = pokemon.stats.map(stat => createStatusBar(stat.name, stat.base_stat)).join('');
 
+          const evolutions = pokemon.evolutions.map(evo => {
+            const method = evo.method || '';
+            const minLevel = evo.min_level ? `Lv ${evo.min_level}` : '';
+            const methodDisplay = method != ''
+              ? `<iconify-icon icon="material-symbols:arrow-right-alt-rounded" width="30" height="30"></iconify-icon>` : method;
+            const methodClass = (methodDisplay || minLevel) ? '' : 'd-none';
+
+            const levelUpDetails = [];
+            if (evo.min_affection) levelUpDetails.push(`<iconify-icon icon="uil:heart" width="30" height="30"></iconify-icon>${evo.min_affection}`);
+            if (evo.min_beauty) levelUpDetails.push(`<iconify-icon icon="solar:heart-shine-broken" width="30" height="30"></iconify-icon>${evo.min_beauty}`);
+            if (evo.min_happiness) levelUpDetails.push(`<iconify-icon icon="uil:smile" width="30" height="30"></iconify-icon>${evo.min_happiness}`);
+            if (evo.min_level) levelUpDetails.push(`Lv: ${evo.min_level}`);
+            if (evo.needs_overworld_rain) levelUpDetails.push('Needs Overworld Rain');
+            if (evo.time_of_day) levelUpDetails.push(`<iconify-icon icon="mingcute:time-line" width="30" height="30"></iconify-icon>${evo.time_of_day}`);
+            if (evo.trade_species) levelUpDetails.push(`Trade Species: ${evo.trade_species}`);
+            if (evo.turn_upside_down) levelUpDetails.push('Turn Upside Down');
+            if (evo.item) levelUpDetails.push(`Usar <img src="${evo.item_image}">`);
+            if (evo.held_item) levelUpDetails.push(`Troca <img src="${evo.held_item_image}">`);
+
+            const evolutionDetails = levelUpDetails.length > 0 ? `<div class="evolution-details">${levelUpDetails.join('<br>')}</div>` : '';
+
+            return `
+            <div class="evolution-method ${methodClass}">
+              ${methodDisplay}
+              <span class="hwm">${evolutionDetails}</span>
+            </div>
+            <div class="evolution">
+              <img src="${evo.photo}">
+              <span class="evolution-name">${evo.name}</span>
+            </div>
+          `;
+          }).join('');
+
           const modalBody = `
           <div class="card-pokemon bg-img p-3" data-type="${firstType}" id="pokemon-${pokemon.number}">
-            <h3>• ${pokemon.name} •</h3>
+            <h3>${pokemon.name}</h3>
             <img class="pkm-img" src="${pokemon.photo}">
             <div class="pkm-infos">
               <div class="label-hw d-flex flex-column align-items-center justify-content-center">
                 <p class="d-flex align-items-center m-0 hw-text">
-                  <i class="uil uil-ruler"></i> Altura
+                  <iconify-icon icon="material-symbols:height" width="30" height="30"></iconify-icon>
+                  Altura
                 </p>
                 <span class="hwm">${heightInMeters.toFixed(1)} M</span>
               </div>
@@ -255,28 +293,32 @@ $(document).ready(function () {
               </div>
               <div class="label-hw d-flex flex-column align-items-center justify-content-center">
                 <p class="d-flex align-items-center m-0 hw-text">
-                  <i class="uil uil-dumbbell"></i> Peso
+                  <iconify-icon icon="material-symbols:weight-outline" width="30" height="30"></iconify-icon>
+                  Peso
                 </p>
                 <span class="hwm">${weightInKg.toFixed(1)} KG</span>
               </div>
             </div>
             
-            ${statusBars}
+            <div class="w-100">
+              ${statusBars}
+            </div>
+
+            <h4 class="evolution-title">Evoluções</h4>
+            <div class="evolutions w-100">
+              ${evolutions || '<p>Este Pokémon não tem evoluções.</p>'}
+            </div>
 
           </div>
           `;
 
           $('#pokemonModalBody').html(modalBody);
-
-          $('#pokemonModal .modal-body').css('background-image', `url(/assets/img/half-pokeball.svg), radial-gradient(80% 80% at 50% bottom, ${gradientColor}, rgba(6, 14, 32, 0.8))`);
-          // Exibindo o modal
+          $('#pokemonModal .modal-body').css('background-image', `url(/assets/img/half-pokeball.svg), radial-gradient(80% 80% at 50% bottom, ${gradientColor}, rgba(6, 14, 32, 1))`);
           $('#pokemonModal').modal('show');
         });
       });
-
     });
   }
-
   loadPokemonItens(offset, limit);
 
   $loadMoreButton.on('click', function () {

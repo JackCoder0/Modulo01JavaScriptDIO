@@ -170,7 +170,7 @@ i {
 .hwm {
   color: #fff;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -199,6 +199,13 @@ i {
   color: #fff;
 }
 
+.evolution-method {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .card-pokemon {
   display: flex;
   align-items: center;
@@ -208,14 +215,24 @@ i {
   /* border: 1px solid hsla(0, 0%, 100%, .2); */
   background-size: 50%, auto;
   background-repeat: no-repeat;
-  width: 500px;
+  width: 550px;
   color: #fff;
 }
 
 .evolutions,
 .variants {
   display: flex;
+  justify-content: center;
   gap: 10px;
+  background: #9d9d9d7b;
+  border-radius: 10px;
+}
+
+.evolution-details{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .evolution,
@@ -227,7 +244,7 @@ i {
 
 .evolution img,
 .variant img {
-  width: 150px;
+  width: 110px;
   transition: 0.5s;
 }
 
