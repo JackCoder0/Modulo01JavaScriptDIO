@@ -9,4 +9,5 @@ class Pokemon {
   height;
   stats = [];
   evolutions = [];
+  variants = [];
 }

@@ -74,16 +74,37 @@ pokeApi.getEvolutions = (speciesUrl) => {
     });
 };
 
+pokeApi.getVariants = (speciesUrl) => {
+  return $.get(speciesUrl).then((speciesDetail) => {
+    const variantRequests = speciesDetail.varieties
+      .filter((variety) => !variety.is_default)
+      .map((variety) => {
+        return $.get(variety.pokemon.url).then((pokeDetail) => {
+          return convertPokeApiDetailToPokemon(pokeDetail);
+        });
+      });
+
+    return $.when(...variantRequests).then((...variantResults) => {
+      return variantResults;
+    });
+  });
+};
+
 pokeApi.getPokemonDetail = (pokemon) => {
   return $.get(pokemon.url)
     .then((pokeDetail) => {
       const pokemonData = convertPokeApiDetailToPokemon(pokeDetail);
 
-      return pokeApi.getEvolutions(pokeDetail.species.url).then((evolutions) => {
+      const evolutionPromise = pokeApi.getEvolutions(pokeDetail.species.url);
+      const variantsPromise = pokeApi.getVariants(pokeDetail.species.url);
+
+      return Promise.all([evolutionPromise, variantsPromise]).then(([evolutions, variants]) => {
         pokemonData.evolutions = evolutions;
-        console.log(pokemonData);
+        pokemonData.variants = variants;
+
         return pokemonData;
       });
+
     });
 };
 

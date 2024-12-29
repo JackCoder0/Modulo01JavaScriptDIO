@@ -4,8 +4,35 @@ $(document).ready(function () {
   const $cardPokemon = $('.card-pokemon');
 
   const maxRecords = 151;
-  const limit = 133;
+  const limit = 50;
   let offset = 0;
+
+  function loadPokemonByName(pokemonName) {
+    const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`;
+
+    pokeApi.getPokemonDetail({ url })
+      .then((pokemon) => {
+        if (pokemon) {
+          console.log(pokemon)
+          showPokemonModal(pokemon);
+        } else {
+          alert('Pokémon não encontrado!');
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Erro ao buscar o Pokémon. Verifique se o nome está correto!');
+      });
+  }
+
+  $('#searchButton').on('click', function () {
+    const pokemonName = $('#searchPokemon').val();
+    if (pokemonName) {
+      loadPokemonByName(pokemonName);
+    } else {
+      alert('Por favor, digite o nome de um Pokémon!');
+    }
+  });
 
   function convertWeightToKilograms(weight) {
     const kilograms = weight / 10;
@@ -221,62 +248,59 @@ $(document).ready(function () {
     return gradientColor;
   }
 
-  function loadPokemonItens(offset, limit) {
-    pokeApi.getPokemons(offset, limit).then((pokemons = []) => {
-      const newHtml = pokemons.map(convertPokemonToLi).join('');
-      $pokemonList.append(newHtml);
+  function showPokemonModal(pokemon) {
+    console.log(pokemon)
+    const firstType = pokemon.types[0];
+    const gradientColor = getGradientColor(firstType);
+    const weightInKg = convertWeightToKilograms(pokemon.weight);
+    const heightInMeters = convertHeightToMeters(pokemon.height);
+    const statusBars = pokemon.stats.map(stat => createStatusBar(stat.name, stat.base_stat)).join('');
 
-      pokemons.forEach((pokemon) => {
-        const $cardElement = $(`#pokemon-${pokemon.number}`);
-        const $iconElement = $(`#pkm-icon-${pokemon.number}`);
-        if ($cardElement.length) {
-          setGradientColor($cardElement, pokemon.types[0], $iconElement);
-        }
-      });
+    const evolutions = pokemon.evolutions.map(evo => {
+      const method = evo.method || '';
+      const minLevel = evo.min_level ? `Lv ${evo.min_level}` : '';
+      const methodDisplay = method != ''
+        ? `<iconify-icon icon="material-symbols:arrow-right-alt-rounded" width="30" height="30"></iconify-icon>` : method;
+      const methodClass = (methodDisplay || minLevel) ? '' : 'd-none';
 
-      pokemons.forEach((pokemon) => {
-        const selector = `#pokemon-${pokemon.number}`;
-        $(selector).on('click', function () {
-          const firstType = pokemon.types[0];
-          const gradientColor = getGradientColor(firstType);
-          const weightInKg = convertWeightToKilograms(pokemon.weight);
-          const heightInMeters = convertHeightToMeters(pokemon.height);
-          const statusBars = pokemon.stats.map(stat => createStatusBar(stat.name, stat.base_stat)).join('');
+      const levelUpDetails = [];
+      if (evo.min_affection) levelUpDetails.push(`<iconify-icon icon="uil:heart" width="30" height="30"></iconify-icon>${evo.min_affection}`);
+      if (evo.min_beauty) levelUpDetails.push(`<iconify-icon icon="solar:heart-shine-broken" width="30" height="30"></iconify-icon>${evo.min_beauty}`);
+      if (evo.min_happiness) levelUpDetails.push(`<iconify-icon icon="uil:smile" width="30" height="30"></iconify-icon>${evo.min_happiness}`);
+      if (evo.min_level) levelUpDetails.push(`Lvl: ${evo.min_level}`);
+      if (evo.method === 'TRADE' && evo.held_item == null) levelUpDetails.push('Troca');
+      if (evo.method != 'TRADE' && evo.method != 'USE-ITEM' && evo.method != 'LEVEL-UP') levelUpDetails.push(evo.method);
+      if (evo.needs_overworld_rain) levelUpDetails.push('Needs Overworld Rain');
+      if (evo.time_of_day) levelUpDetails.push(`<iconify-icon icon="mingcute:time-line" width="30" height="30"></iconify-icon>${evo.time_of_day}`);
+      if (evo.trade_species) levelUpDetails.push(`Trade Species: ${evo.trade_species}`);
+      if (evo.turn_upside_down) levelUpDetails.push('Turn Upside Down');
+      if (evo.item) levelUpDetails.push(`Usar <img src="${evo.item_image}">`);
+      if (evo.held_item) levelUpDetails.push(`Troca <img src="${evo.held_item_image}">`);
 
-          const evolutions = pokemon.evolutions.map(evo => {
-            const method = evo.method || '';
-            const minLevel = evo.min_level ? `Lv ${evo.min_level}` : '';
-            const methodDisplay = method != ''
-              ? `<iconify-icon icon="material-symbols:arrow-right-alt-rounded" width="30" height="30"></iconify-icon>` : method;
-            const methodClass = (methodDisplay || minLevel) ? '' : 'd-none';
+      const evolutionDetails = levelUpDetails.length > 0 ? `<div class="evolution-details">${levelUpDetails.join('<br>')}</div>` : '';
 
-            const levelUpDetails = [];
-            if (evo.min_affection) levelUpDetails.push(`<iconify-icon icon="uil:heart" width="30" height="30"></iconify-icon>${evo.min_affection}`);
-            if (evo.min_beauty) levelUpDetails.push(`<iconify-icon icon="solar:heart-shine-broken" width="30" height="30"></iconify-icon>${evo.min_beauty}`);
-            if (evo.min_happiness) levelUpDetails.push(`<iconify-icon icon="uil:smile" width="30" height="30"></iconify-icon>${evo.min_happiness}`);
-            if (evo.min_level) levelUpDetails.push(`Lv: ${evo.min_level}`);
-            if (evo.needs_overworld_rain) levelUpDetails.push('Needs Overworld Rain');
-            if (evo.time_of_day) levelUpDetails.push(`<iconify-icon icon="mingcute:time-line" width="30" height="30"></iconify-icon>${evo.time_of_day}`);
-            if (evo.trade_species) levelUpDetails.push(`Trade Species: ${evo.trade_species}`);
-            if (evo.turn_upside_down) levelUpDetails.push('Turn Upside Down');
-            if (evo.item) levelUpDetails.push(`Usar <img src="${evo.item_image}">`);
-            if (evo.held_item) levelUpDetails.push(`Troca <img src="${evo.held_item_image}">`);
+      return `
+        <div class="evolution-method ${methodClass}">
+          ${methodDisplay}
+          <span class="hwm">${evolutionDetails}</span>
+        </div>
+        <div class="evolution">
+          <img src="${evo.photo}">
+          <span class="evolution-name">${evo.name}</span>
+        </div>
+        `;
+    }).join('');
 
-            const evolutionDetails = levelUpDetails.length > 0 ? `<div class="evolution-details">${levelUpDetails.join('<br>')}</div>` : '';
-
-            return `
-            <div class="evolution-method ${methodClass}">
-              ${methodDisplay}
-              <span class="hwm">${evolutionDetails}</span>
+    const variants = pokemon.variants.map(variant => {
+      return `
+            <div class="variant">
+                <img src="${variant.photo}" alt="${variant.name}">
+                <span class="variant-name">${variant.name}</span>
             </div>
-            <div class="evolution">
-              <img src="${evo.photo}">
-              <span class="evolution-name">${evo.name}</span>
-            </div>
-          `;
-          }).join('');
+        `;
+    }).join('');
 
-          const modalBody = `
+    const modalBody = `
           <div class="card-pokemon bg-img p-3" data-type="${firstType}" id="pokemon-${pokemon.number}">
             <h3>${pokemon.name}</h3>
             <img class="pkm-img" src="${pokemon.photo}">
@@ -299,22 +323,48 @@ $(document).ready(function () {
                 <span class="hwm">${weightInKg.toFixed(1)} KG</span>
               </div>
             </div>
-            
+
             <div class="w-100">
               ${statusBars}
             </div>
 
+            ${pokemon.evolutions && pokemon.evolutions.length > 0 ? `
             <h4 class="evolution-title">Evoluções</h4>
             <div class="evolutions w-100">
-              ${evolutions || '<p>Este Pokémon não tem evoluções.</p>'}
-            </div>
+              ${evolutions}
+            </div>` : ''}
+
+            ${pokemon.variants && pokemon.variants.length > 0 ? `
+            <h4 class="variant-title">Variantes</h4>
+            <div class="variants w-100">
+              ${variants}
+            </div>` : ''}
 
           </div>
           `;
 
-          $('#pokemonModalBody').html(modalBody);
-          $('#pokemonModal .modal-body').css('background-image', `url(/assets/img/half-pokeball.svg), radial-gradient(80% 80% at 50% bottom, ${gradientColor}, rgba(6, 14, 32, 1))`);
-          $('#pokemonModal').modal('show');
+    $('#pokemonModalBody').html(modalBody);
+    $('#pokemonModal .modal-body').css('background-image', `url(/assets/img/half-pokeball.svg), radial-gradient(80% 80% at 50% bottom, ${gradientColor}, rgba(6, 14, 32, 1))`);
+    $('#pokemonModal').modal('show');
+  }
+
+  function loadPokemonItens(offset, limit) {
+    pokeApi.getPokemons(offset, limit).then((pokemons = []) => {
+      const newHtml = pokemons.map(convertPokemonToLi).join('');
+      $pokemonList.append(newHtml);
+
+      pokemons.forEach((pokemon) => {
+        const $cardElement = $(`#pokemon-${pokemon.number}`);
+        const $iconElement = $(`#pkm-icon-${pokemon.number}`);
+        if ($cardElement.length) {
+          setGradientColor($cardElement, pokemon.types[0], $iconElement);
+        }
+      });
+
+      pokemons.forEach((pokemon) => {
+        const selector = `#pokemon-${pokemon.number}`;
+        $(selector).on('click', function () {
+          showPokemonModal(pokemon);
         });
       });
     });
@@ -334,4 +384,5 @@ $(document).ready(function () {
       loadPokemonItens(offset, limit);
     }
   });
+
 });
