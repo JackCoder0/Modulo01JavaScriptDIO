@@ -3,7 +3,7 @@ $(document).ready(function () {
   const $loadMoreButton = $('#loadMoreButton');
   const $cardPokemon = $('.card-pokemon');
 
-  const maxRecords = 151;
+  const maxRecords = 1025;
   const limit = 50;
   let offset = 0;
 
@@ -90,6 +90,7 @@ $(document).ready(function () {
 
     return `
     <div class="container card-pokemon bg-img col mt-5 p-3" data-type="${firstType}" id="pokemon-${pokemon.number}">
+      <span>#${pokemon.number}</span>
       <h3>• ${pokemon.name} •</h3>
       <img class="pkm-img" src="${pokemon.photo}">
       <div class="pkm-infos">
