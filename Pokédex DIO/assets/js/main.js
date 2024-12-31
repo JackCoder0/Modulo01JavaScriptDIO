@@ -13,7 +13,6 @@ $(document).ready(function () {
     pokeApi.getPokemonDetail({ url })
       .then((pokemon) => {
         if (pokemon) {
-          console.log(pokemon)
           showPokemonModal(pokemon);
         } else {
           alert('Pokémon não encontrado!');
@@ -25,12 +24,16 @@ $(document).ready(function () {
       });
   }
 
-  $('#searchButton').on('click', function () {
+  $('#searchPokemon').keydown(function (event) {
     const pokemonName = $('#searchPokemon').val();
-    if (pokemonName) {
-      loadPokemonByName(pokemonName);
-    } else {
-      alert('Por favor, digite o nome de um Pokémon!');
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (pokemonName) {
+        loadPokemonByName(pokemonName);
+      } else {
+        alert('Por favor, digite o nome de um Pokémon!');
+      }
     }
   });
 
@@ -250,7 +253,6 @@ $(document).ready(function () {
   }
 
   function showPokemonModal(pokemon) {
-    console.log(pokemon)
     const firstType = pokemon.types[0];
     const gradientColor = getGradientColor(firstType);
     const weightInKg = convertWeightToKilograms(pokemon.weight);

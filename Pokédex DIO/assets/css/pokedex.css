@@ -199,7 +199,7 @@ i {
   color: #fff;
 }
 
-.evolution-method {
+as .evolution-method {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -228,7 +228,7 @@ i {
   border-radius: 10px;
 }
 
-.evolution-details{
+.evolution-details {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -256,4 +256,37 @@ i {
 .evolution span,
 .variant span {
   color: #fff;
+}
+
+.label-search {
+  width: 50%;
+  height: 45px;
+  border-radius: 1rem;
+  border: 1px solid hsla(0, 0%, 100%, .2);
+  background: rgba(6, 11, 21, .8);
+}
+
+#searchPokemon {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  font-style: italic;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+#searchPokemon::placeholder {
+  color: #fff;
+  font-style: italic;
+}
+
+#loadMoreButton {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 1rem;
+  border: 1px solid hsla(0, 0%, 100%, .2);
+  background: rgba(6, 11, 21, .8);
+  padding: 15px;
 }
